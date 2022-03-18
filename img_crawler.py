@@ -18,7 +18,11 @@ def get_image(site_url):
 
 
 def main():
-    amir = get_image("https://www.gettyimages.in/photos/aamir-khan-actor")
+    img_link = get_image("https://www.gettyimages.in/photos/aamir-khan-actor")
+    head = "https://www.gettyimages.in"
+    for i in img_link:
+        print(head+i,
+              "\n")
 
 
 if __name__ == "__main__":
