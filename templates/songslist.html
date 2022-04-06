@@ -1,0 +1,16 @@
+{% extends 'index.html' %}
+{%block songlist %}
+<h1> Songs </h1>
+<h4>
+These are the songs for {{artist[1]}}
+</h4>
+<p>
+<ul type="none">
+{%for song,sid in songs%}
+<div class="list-box">
+<li><a href="{{url_for('lyrics',id=artist[0],sid=sid)}}">{{song}} </a></li>
+</div>
+{%endfor%}
+</ul>
+</p>
+{%endblock%}

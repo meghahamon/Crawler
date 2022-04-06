@@ -1,0 +1,63 @@
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@1,500&display=swap');
+* {
+  margin: 0;
+  font-family: Verdana, Geneva, Tahoma, sans-serif;
+}
+::-webkit-scrollbar {
+  width: 20px;
+}.body-bg {
+  background-color:whitesmoke;
+  width: 100%;
+}.navbar {
+  background-color: rgb(255, 255, 255);
+  width: 100%;
+  justify-content: center;
+  text-align: center;
+  height: 93px;
+}.heading {
+  display: contents;
+  text-align: center;
+}.song {
+  color: rgb(45, 45, 45);
+  background: transparent;
+}.lyrics {
+  color: #467FB9
+;
+  background: transparent;
+}.com {
+  color: rgb(45, 45, 45);
+  background: transparent;
+  padding-top: 14px;
+  font-weight: bold;
+}a:hover {
+  color: rgb(228, 50, 50);
+}a,a:active,a:focus {
+  text-decoration: none;
+  color: crimson;
+}.lyrics_para {
+  max-width: 50em;
+  justify-content: center;
+  display: grid;
+}h1,h4 {
+  text-align: center;
+  font-family:'Lucida Sans', 'Lucida Sans Regular', 'Lucida Grande', 'Lucida Sans Unicode', Geneva, Verdana, sans-serif;
+}.list-box {
+  border: 2px solid rgb(16, 114, 209);
+
+  border-radius: 2px;
+  min-width: 20px;
+  margin-bottom: 3px;
+  padding-left: 5px;
+  background-color: rgb(215, 237, 240);
+}.list-box:hover {
+  outline-color: wheat;
+  background-color: whitesmoke;
+}div.col-3 {
+  border-right: 1px dotted black;
+  font-size: 100%;
+}.footer {
+  align-left:none;
+}ul {
+  justify-content: center;
+  display: grid;
+}

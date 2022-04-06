@@ -1,30 +1,9 @@
 import requests
-import os
 from bs4 import BeautifulSoup
+import psycopg2
+import sys
 
-
-def get_songs(artist_url):
-    songs = []
-    r = requests.get(artist_url)
-    body = r.content
-    soup = BeautifulSoup(body, features="html.parser")
-    tracklists = soup.find("table", {"class": "tracklist"})
-    links = tracklists.find_all("a")
-    for i in links:
-        songs.append((i.text, i['href']))
-    return songs
-
-
-def get_lyrics(song_url):
-    r = requests.get(song_url)
-    body = r.content
-    soup = BeautifulSoup(body, features="html.parser")
-    lyrics_div = soup.find("p", {"id": "songLyricsDiv"})
-    lyrics = lyrics_div.text
-    return lyrics
-
-
-def get_artist(url):
+def get_artists(url):
     ret = []
     r = requests.get(url)
     body = r.content
@@ -35,31 +14,80 @@ def get_artist(url):
         ret.append((i.text, i['href']))
     return ret
 
+def get_songs(artist_url):
+    songs=[]
+    r = requests.get(artist_url)
+    body = r.content
+    soup = BeautifulSoup(body, features="html.parser")
+    tracklists = soup.find("table", {"class" : "tracklist"})
+    links=tracklists.find_all("a")
+    for i in links:
+        songs.append((i.text,i['href']))
+    return songs
+
+def get_lyrics(song_url):
+    r = requests.get(song_url)
+    body = r.content
+    soup = BeautifulSoup(body, features="html.parser")
+    lyrics_div = soup.find("p", {"id": "songLyricsDiv"})
+    lyrics = lyrics_div.text
+    return lyrics
 
 def crawl():
-    artists = get_artist("https://www.songlyrics.com/a/")
-    base_dir = "lyrics"
-    try:
-        os.mkdir(base_dir)
-    except Exception:
-        pass
-    for name, link in artists:
-        print(name, "  : ", link)
-        name_dir = os.path.join(base_dir, name.replace(" ", "_").lower())
-        try:
-            os.mkdir(name_dir)
-        except Exception:
-            pass
+    conn = psycopg2.connect("dbname=lyrics")
+    cur = conn.cursor()
+    cur.execute("CREATE TABLE artist ( id SERIAL PRIMARY KEY, name VARCHAR(20) );")
+    cur.execute("CREATE TABLE song ( song_id SERIAL PRIMARY KEY, artist INTEGER references artist(id), song_name TEXT, lyrics TEXT );")
+    artists= get_artists("https://www.songlyrics.com/a/")
+    for name, link in artists[:10]:
+        cur.execute("INSERT INTO artist (name) VALUES (%s);", (name,))
+        print(name, " : ",link)
         songs = get_songs(link)
-        for song, song_link in songs:
-            lyrics = get_lyrics(song_link)
-            song_file = os.path.join(
-                name_dir, song.replace(" ", "_").lower()+".txt")
-            with open(song_file, "w") as f:
-                f.write(lyrics)
-            print(".", end="", flush=True)
-        print("DONE")
+        for song, song_link in songs[:10]:
+                lyrics = get_lyrics(song_link)
+                cur.execute("INSERT INTO song (artist, song_name, lyrics) VALUES ((SELECT id from artist where name=%s),%s,%s);", (name,song,lyrics))    
+    conn.commit()
+    print("DONE")
 
+# get all song and artist
+def get_all_songs(artist):
+    conn = psycopg2.connect("dbname=lyrics")
+    cur = conn.cursor()
+    cur.execute("SELECT song.song_name FROM song, artist WHERE artist.id = song.artist AND artist.name=%s", (artist,))
+    songs = cur.fetchall()
+    return songs
+
+#Songs by artist id
+def get_all_songs(art_id):
+    con = psycopg2.connect("dbname=lyrics")
+    cmd=con.cursor()
+    cmd.execute("select song.song_name, song.song_id from song, artist where artist.id = song.artist and artist.id=%s",(art_id,))
+    songs= cmd.fetchall()
+    return songs
+
+#Get singer
+def singer(artist_id):
+    con = psycopg2.connect("dbname=lyrics")
+    cmd=con.cursor()
+    cmd.execute("select id,name from artist where artist.id=%s",(artist_id,))
+    singer= cmd.fetchone()
+    return singer
+
+#Get the Artist for base files
+def get_all_artist():
+    con = psycopg2.connect("dbname=lyrics")
+    cur = con.cursor()
+    cur.execute("select id,name from artist" )
+    artists = cur.fetchall()
+    return artists 
+
+#Lyrics by Song ID
+def get_lyrics(song_id):
+    con = psycopg2.connect("dbname=lyrics")
+    cur = con.cursor()
+    cur.execute("select lyrics,song_name from song where song_id=%s",(song_id,))
+    lyrics = cur.fetchone()
+    return lyrics
 
 if __name__ == "__main__":
     crawl()

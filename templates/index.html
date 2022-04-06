@@ -1,0 +1,17 @@
+{% extends 'base.html' %} 
+
+
+{%block index%}
+<h1>Welcome</h1>
+
+<h4>Hi there. Welcome to the Lyrics database. We have the following artists</h4>
+{%endblock%}
+{%block artist%}
+<ul type="none">
+  {%for id, name in artists%}
+  <div class="list-box">
+    <a href="/songs/{{id}}">{{name}}</a>
+  </div>
+  {%endfor%}
+</ul>
+{%endblock%}
