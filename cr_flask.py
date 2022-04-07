@@ -1,11 +1,16 @@
-from flask import Flask, render_template
+from flask import Flask, render_template, jsonify
 import get_data
 app = Flask(__name__)
 
 @app.route("/")
 def hello():
-    artists = get_data.get_all_artist()
-    return render_template("index.html", artists=artists)
+    return render_template("base.html")
+
+@app.route("/artists")
+def get_artists():
+    artist = get_data.get_all_artist()
+    artist_arr=[{'id':i[0],'name':i[1]} for i in artist]
+    return jsonify(artist_arr)
 
 @app.route("/songs/<int:id>")
 def list_all_songs(id):
