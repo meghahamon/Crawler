@@ -17,7 +17,9 @@ def list_all_songs(id):
     songs= get_data.get_all_songs(id)
     artist= get_data.singer(id)
     artists = get_data.get_all_artist()
-    return render_template("songslist.html",artist=artist,artists=artists,songs=songs)
+    songs_arr = [{'id':i[1], "name":i[0]} for i in songs]
+    return jsonify(songs_arr)
+
 
 @app.route("/songs/<int:id>/lyrics/<int:sid>")
 def lyrics(sid,id):
@@ -25,7 +27,8 @@ def lyrics(sid,id):
     songs= get_data.get_all_songs(id)
     artist= get_data.singer(id)
     artists = get_data.get_all_artist()
-    return render_template("lyrics.html",lyrics=lyrics,artist=artist,artists=artists,songs=songs, current=sid)
+    print(lyrics)
+    return jsonify(lyrics)
 
 if __name__== "__main__":
     app.run(debug=True) 
